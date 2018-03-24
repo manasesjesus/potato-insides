@@ -57,3 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
+# app files
+hk_id_*
+package-lock.json
+/qrcodes
