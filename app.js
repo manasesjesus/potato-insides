@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 const express = require('express');
 const app  = express();
+const bodyParser = require('body-parser');
 //const fs = require('fs');
 //const path = require('path');
 
