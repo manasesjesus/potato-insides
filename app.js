@@ -11,7 +11,7 @@ app
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 // 
-app.get("/qrcodes/customer", function () {
+app.get("/qrcodes/customer", function (req, res) {
   // middleware to generate a qrcode
   res.json({"qr" : "this is your new code"});
 });
