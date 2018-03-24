@@ -1,79 +1,45 @@
-'use strict';
-const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-// Imports dependencies and set up http server
-const 
-  request = require('request'),
-  express = require('express'),
-  body_parser = require('body-parser'),
-  app = express().use(body_parser.json()); // creates express http server
+/**
+ * Description of the awesome node app
+ */
 
-// Sets server port and logs message on success
-app.listen(process.env.PORT || 1337, () => console.log('webhook is listening'));
+const PORT = process.env.PORT || 5000;
 
-// Accepts POST requests at /webhook endpoint
-app.post('/webhook', (req, res) => {  
+// Middlewares
+const express = require('express');
+const app  = express();
+const bodyParser = require('body-parser');
+//const fs = require('fs');
+//const path = require('path');
 
-  // Parse the request body from the POST
-  let body = req.body;
+// QR controllers
+const encoder = require("./controllers/encoder.js");
+const decoder = require("./controllers/decoder.js");
 
-  // Check the webhook event is from a Page subscription
-  if (body.object === 'page') {
+// Process application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}))
 
-    body.entry.forEach(function(entry) {
+// Landing page
+app
+//  .use(express.static(path.join(__dirname, 'public')))
+//  .set('views', path.join(__dirname, 'views'))
+  .get('/', (req, res) => res.json({ "hello" : "hooman" }))
+  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-      // Gets the body of the webhook event
-      let webhook_event = entry.messaging[0];
-      console.log(webhook_event);
+/**
+ * 
+ */
+app.get("/bizs/:id/purchases/", function (req, res) {
+    let id   = req.params.id;
+    let time = new Date().getTime();
+    let img_name = "qrcodes/" + id + "_" + time + ".png";
 
-
-      // Get the sender PSID
-      let sender_psid = webhook_event.sender.id;
-      console.log('Sender ID: ' + sender_psid);
-
-      // Check if the event is a message or postback and
-      // pass the event to the appropriate handler function
-      if (webhook_event.message) {
-        handleMessage(sender_psid, webhook_event.message);        
-      } else if (webhook_event.postback) {
-        
-        handlePostback(sender_psid, webhook_event.postback);
-      }
-      
-    });
-    // Return a '200 OK' response to all events
-    res.status(200).send('EVENT_RECEIVED');
-
-  } else {
-    // Return a '404 Not Found' if event is not from a page subscription
-    res.sendStatus(404);
-  }
-
+    encoder.createQRImage(res, img_name);
 });
 
-// Accepts GET requests at the /webhook endpoint
-app.get('/webhook', (req, res) => {
-  
-  /** UPDATE YOUR VERIFY TOKEN **/
-  const VERIFY_TOKEN = "EAAGISCajFTABAN3fR25J8ZANwWt0294qIMIbP9pgj2ZAybtknpZC2Tl82ZCKZBSBOa5yYgV07641o6YqhAPSHfwzHyrD0dbCnTFbzoZBjOuthZAmP8efKWNkFjsZAveRNz8pyh1HMTpgLwUQ7XKWssLqUpzsoRYC7cJpBZCVLZAkuCZBhmPgr2INHOr72c8w3YuS30ZD";
-  
-  // Parse params from the webhook verification request
-  let mode = req.query['hub.mode'];
-  let token = req.query['hub.verify_token'];
-  let challenge = req.query['hub.challenge'];
-    
-  // Check if a token and mode were sent
-  if (mode && token) {
-  
-    // Check the mode and token sent are correct
-    if (mode === 'subscribe' && token === VERIFY_TOKEN) {
-      
-      // Respond with 200 OK and challenge token from the request
-      console.log('WEBHOOK_VERIFIED');
-      res.status(200).send(challenge);
-    
-    } else {
-      // Responds with '403 Forbidden' if verify tokens do not match
-      res.sendStatus(403);      
-    }
-  }
-});
+// for Facebook verification
+app.get('/webhook/', function (req, res) {
+	if (req.query['hub.verify_token'] === 'my_voice_is_my_password_verify_me') {
+		res.send(req.query['hub.challenge'])
+	}
+	res.send('Error, wrong token')
+})
