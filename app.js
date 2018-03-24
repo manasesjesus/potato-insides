@@ -7,12 +7,16 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 const express = require('express');
 const app  = express();
+const bodyParser = require('body-parser');
 //const fs = require('fs');
 //const path = require('path');
 
 // QR controllers
 const encoder = require("./controllers/encoder.js");
 const decoder = require("./controllers/decoder.js");
+
+// Process application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}))
 
 // Landing page
 app
@@ -31,3 +35,11 @@ app.get("/bizs/:id/purchases/", function (req, res) {
 
     encoder.createQRImage(res, img_name);
 });
+
+// for Facebook verification
+app.get('/webhook/', function (req, res) {
+	if (req.query['hub.verify_token'] === 'my_voice_is_my_password_verify_me') {
+		res.send(req.query['hub.challenge'])
+	}
+	res.send('Error, wrong token')
+})
