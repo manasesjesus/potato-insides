@@ -22,7 +22,7 @@ app
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
 /**
- *
+ * 
  */
 app.get("/bizs/:id/purchases/", function (req, res) {
     let id   = req.params.id;

@@ -5,8 +5,13 @@
 const QRCode = require('qrcode');
 const fs = require('fs');
 
+/**
+ * Create an unique QR-code image
+ * Response:
+ *      the QR-code as a PNG image
+ */
 function createQRImage (res, img_name) {
-    QRCode.toFile(img_name, "www.thisIsSparta.com", {
+    QRCode.toFile(img_name, img_name.substring(img_name.indexOf("/") + 1, img_name.indexOf(".png")), {
         color: {
             dark: "#00F",   // Blue dots
             light: "#0000"  // Transparent background
@@ -19,7 +24,6 @@ function createQRImage (res, img_name) {
 
         res.writeHead(200, { "Content-Type": "image/png" });
         res.end(img, "binary");
-
     });
 }
 
