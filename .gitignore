@@ -60,4 +60,4 @@ typings/
 # app files
 hk_id_*
 package-lock.json
-/qrcodes
+/qrcodes/*.png
