@@ -20,7 +20,8 @@ app.get("/qrcodes/customer", function (req, res) {
         color: {
             dark: '#00F',  // Blue dots
             light: '#0000' // Transparent background
-        }
+        },
+        width: 500
     }, function (err) {
         if (err) throw err
         console.log('done');
@@ -30,7 +31,6 @@ app.get("/qrcodes/customer", function (req, res) {
         res.writeHead(200, {'Content-Type': 'image/png' });
         res.end(img, 'binary');
 
-        //res.send({ qr: "generated"});
     });
 
 });
