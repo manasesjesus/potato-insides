@@ -7,11 +7,11 @@ const PORT = process.env.PORT || 5000;
 // Middlewares
 const express = require('express');
 const app  = express();
-const fs = require('fs');
-const path = require('path');
+//const fs = require('fs');
+//const path = require('path');
 
 // QR Codes generator
-const QRCode = require('qrcode');
+//const QRCode = require('qrcode');
 
 // ...
 const encoder = require("./controllers/encoder.js");
@@ -32,7 +32,5 @@ app.get("/bizs/:id/purchases/:time", function (req, res) {
     let img_name = "qrcodes/" + id + "_" + time + ".png";
 
     encoder.createQRImage(res, img_name);
-
-
 
 });
