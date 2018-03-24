@@ -1,11 +1,24 @@
 {
   "name": "potato-insides",
   "version": "0.0.1",
-  "dependencies": {
-    "express": "2.5.x",    
+  "description": "Feedback chatbot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
-  "engines": {
-    "node": "0.8.x",
-    "npm": "1.1.x"
+  "keywords": [
+    "facebook",
+    "bot",
+    "heroku",
+    "chatbot"
+  ],
+  "author": "potato-insides",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "mongoose": "^4.10.8",
+    "request": "^2.81.0"
   }
 }
