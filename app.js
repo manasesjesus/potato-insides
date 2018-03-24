@@ -14,6 +14,9 @@ const app  = express();
 const encoder = require("./controllers/encoder.js");
 const decoder = require("./controllers/decoder.js");
 
+// Process application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}))
+
 // Landing page
 app
 //  .use(express.static(path.join(__dirname, 'public')))
@@ -31,3 +34,11 @@ app.get("/bizs/:id/purchases/", function (req, res) {
 
     encoder.createQRImage(res, img_name);
 });
+
+// for Facebook verification
+app.get('/webhook/', function (req, res) {
+	if (req.query['hub.verify_token'] === 'my_voice_is_my_password_verify_me') {
+		res.send(req.query['hub.challenge'])
+	}
+	res.send('Error, wrong token')
+})
