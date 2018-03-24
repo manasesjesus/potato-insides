@@ -8,7 +8,7 @@ const fs = require('fs');
 function createQRImage (res, img_name) {
     QRCode.toFile(img_name, "www.thisIsSparta.com", {
         color: {
-            dark: "#F00",   // Blue dots
+            dark: "#00F",   // Blue dots
             light: "#0000"  // Transparent background
         },
         width: 500          // Image size (pixels)

@@ -10,11 +10,9 @@ const app  = express();
 //const fs = require('fs');
 //const path = require('path');
 
-// QR Codes generator
-//const QRCode = require('qrcode');
-
-// ...
+// QR controllers
 const encoder = require("./controllers/encoder.js");
+const decoder = require("./controllers/decoder.js");
 
 // Landing page
 app
@@ -26,11 +24,10 @@ app
 /**
  *
  */
-app.get("/bizs/:id/purchases/:time", function (req, res) {
+app.get("/bizs/:id/purchases/", function (req, res) {
     let id   = req.params.id;
-    let time = req.params.time;
+    let time = new Date().getTime();
     let img_name = "qrcodes/" + id + "_" + time + ".png";
 
     encoder.createQRImage(res, img_name);
-
 });
