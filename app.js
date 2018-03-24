@@ -1,37 +1,33 @@
-const express = require('express');
-const path = require('path');
-const PORT = process.env.PORT || 5000;
-const app  = express();
-const QRCode = require('qrcode');
-const fs = require('fs');
+/**
+ * Description of the awesome node app
+ */
 
+const PORT = process.env.PORT || 5000;
+
+// Middlewares
+const express = require('express');
+const app  = express();
+//const fs = require('fs');
+//const path = require('path');
+
+// QR controllers
+const encoder = require("./controllers/encoder.js");
+const decoder = require("./controllers/decoder.js");
+
+// Landing page
 app
 //  .use(express.static(path.join(__dirname, 'public')))
 //  .set('views', path.join(__dirname, 'views'))
-//  .set('view engine', 'ejs')
-  .get('/', (req, res) => res.json({ "hello" : "world" }))
+  .get('/', (req, res) => res.json({ "hello" : "hooman" }))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-//
-app.get("/qrcodes/customer", function (req, res) {
-    // middleware to generate a qrcode
+/**
+ * 
+ */
+app.get("/bizs/:id/purchases/", function (req, res) {
+    let id   = req.params.id;
+    let time = new Date().getTime();
+    let img_name = "qrcodes/" + id + "_" + time + ".png";
 
-    QRCode.toFile('qrcodes/test.png', 'www.thisIsATest.com', {
-        color: {
-            dark: '#00F',  // Blue dots
-            light: '#0000' // Transparent background
-        },
-        width: 500
-    }, function (err) {
-        if (err) throw err
-        console.log('done');
-
-        var img = fs.readFileSync('qrcodes/test.png');
-
-        res.writeHead(200, {'Content-Type': 'image/png' });
-        res.end(img, 'binary');
-
-    });
-
+    encoder.createQRImage(res, img_name);
 });
-//important
