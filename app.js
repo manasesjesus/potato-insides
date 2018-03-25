@@ -1,6 +1,8 @@
+'use strict'
 /**
  * Description of the awesome node app
  */
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -9,18 +11,11 @@ const express = require("express");
 const app  = express();
 const bodyParser = require("body-parser");
 const request = require("request");
-const Cosmic = require("cosmicjs");
-const BootBot = require("bootbot");
+
 require("dotenv").config();
-const chrono = require("chrono-node");
-var schedule = require("node-schedule");
-const EventEmitter = require("events").EventEmitter;
+
 //const fs = require('fs');
 //const path = require('path');
-
-var config = {};
-const reminders = [];
-const eventEmitter = new EventEmitter();
 
 // QR controllers
 const encoder = require("./controllers/encoder.js");
@@ -56,128 +51,160 @@ app.get("/bizs/:id/purchases/", function (req, res) {
  *
  */
 app.get('/webhook/', function(req, res) {
-    if (req.query['hub.verify_token'] === process.env.VERIFY_TOKEN){
-        return res.send(req.query['hub.challenge']);
+    if (req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
+        console.log("Verified token");
+        return res.status(200).send(req.query["hub.challenge"]);
     }
     res.send('wrong token');
 });
 
-const bot = new BootBot({
-  accessToken: process.env.ACCESS_TOKEN,
-  verifyToken: process.env.VERIFY_TOKEN,
-  appSecret: process.env.APP_SECRET
-});
 
-bot.setGreetingText("Welcome to the Feedback Rewards!");
 
-bot.setGetStartedButton((payload, chat) => {
-  if(config.bucket === undefined){
-    chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts')
-    chat.say("It seems like you have not setup your bucket settings yet. That has to be done before you can do anything else. Make sure to type 'setup'")
-  }
-  BotUserId = payload.sender.id
-});
+// All callbacks for Messenger will be POST-ed here
+app.post("/webhook", function (req, res) {
+    if (req.body.object == "page") {
+        // Iterate over each entry
+        // There may be multiple entries if batched
+        req.body.entry.forEach(function(entry) {
+            entry.messaging.forEach(function(event) {
+                if (event.postback) {
+                    processPostback(event);
+                } else if (event.message) {
+                    processMessage(event);
+                }
+            });
+        });
 
-bot.hear('setup', (payload, chat) => {
-  const getBucketSlug = (convo) => {
-    convo.ask("What's your Bucket's slug?", (payload, convo) => {
-      var slug = payload.message.text;
-      convo.set('slug', slug)
-      convo.say("setting slug as "+slug).then(() => getBucketReadKey(convo));
-    })
-  }
-  const getBucketReadKey = (convo) => {
-    convo.ask("What's your Bucket's read key?", (payload, convo) => {
-      var readkey = payload.message.text;
-      convo.set('read_key', readkey)
-      convo.say('setting read_key as '+readkey).then(() => getBucketWriteKey(convo))
-    })
-  }
-  const getBucketWriteKey = (convo) => {
-    convo.ask("What's your Bucket's write key?", (payload, convo) => {
-      var writekey = payload.message.text
-      convo.set('write_key', writekey)
-      convo.say('setting write_key as '+writekey).then(() => finishing(convo))
-    })
-  }
-  const finishing = (convo) => {
-    var newConfigInfo = {
-      slug: convo.get('slug'),
-      read_key: convo.get('read_key'),
-      write_key: convo.get('write_key')
+        res.sendStatus(200);
     }
-    config.bucket = newConfigInfo
-    convo.say('All set :)')
-    convo.end();
-  }
+});
 
-  chat.conversation((convo) => {
-    getBucketSlug(convo)
-  })
-})
+function processPostback(event) {
+    var senderId = event.sender.id;
+    var payload = event.postback.payload;
 
-bot.hear(['hello', 'hey', 'sup'], (payload, chat)=>{
-  chat.getUserProfile().then((user) => {
-    chat.say(`Hey ${user.first_name}, How are you today?`)
-  })
-})
+    if (payload === "Greeting") {
+        // Get user's first name from the User Profile API
+        // and include it in the greeting
+        request({
+            url: "https://graph.facebook.com/v2.6/" + senderId,
+            qs: {
+                access_token: process.env.PAGE_ACCESS_TOKEN,
+                fields: "first_name"
+            },
+            method: "GET"
+        }, function(error, response, body) {
+            var greeting = "";
+            if (error) {
+                console.log("Error getting user's name: " +  error);
+            } else {
+                var bodyObj = JSON.parse(body);
+                name = bodyObj.first_name;
+                greeting = "Hello " + name + "! ";
+            }
+            var message = greeting + "I'm Taco, your virtual weiter. Would you like a free coffee?";
+            sendMessage(senderId, {text: message});
+        });
+    } else if (payload === "Correct") {
+        sendMessage(senderId, {text: "Great! Come any day to PoC Restaurant with this code FC1982 and claim your free coffee ;)"});
+    } else if (payload === "Incorrect") {
+        sendMessage(senderId, {text: "Oops! Sorry about that. I don't have other coffee today :("});
+    }
+}
 
-bot.hear('config', (payload, chat) => {
-  if(JSON.stringify(config.bucket) === undefined){
-    chat.say("No config found :/ Be sure to run 'setup' to add your bucket details")
-  }
-  chat.say("A config has been found :) "+ JSON.stringify(config.bucket))
-})
+function processMessage(event) {
+    if (!event.message.is_echo) {
+        var message = event.message;
+        var senderId = event.sender.id;
 
-bot.hear('create', (payload, chat) => {
-  chat.conversation((convo) => {
-    convo.ask("What would you like your reminder to be? etc 'I have an appointment tomorrow from 10 to 11 AM' the information will be added automatically", (payload, convo) => {
-      datetime = chrono.parseDate(payload.message.text)
-      var params = {
-        write_key: config.bucket.write_key,
-        type_slug: 'reminders',
-        title: payload.message.text,
-        metafields: [
-         {
-           key: 'date',
-           type: 'text',
-           value: datetime
-         }
-        ]
-      }
-      Cosmic.addObject(config, params, function(error, response){
-        if(!error){
-          eventEmitter.emit('new', response.object.slug, datetime)
-          convo.say("reminder added correctly :)")
-          convo.end()
-        } else {
-          convo.say("there seems to be a problem. . .")
-          convo.end()
+        console.log("Received message from senderId: " + senderId);
+        console.log("Message is: " + JSON.stringify(message));
+
+        // You may get a text or attachment but not both
+        if (message.text) {
+            var formattedMsg = message.text.toLowerCase().trim();
+
+            switch (formattedMsg) {
+                case "type":
+                case "date":
+                getCoffeeDetail(senderId, formattedMsg);
+                break;
+
+                default:
+                findCoffee(senderId, formattedMsg);
+            }
+        } else if (message.attachments) {
+            sendMessage(senderId, {text: "Sorry, I don't understand your request."});
         }
-      })
-    })
-  })
-})
+    }
+}
 
-bot.hear('help', (payload, chat) => {
-  chat.say('Here are the following commands for use.')
-  chat.say("'create': add a new reminder")
-  chat.say("'setup': add your bucket info such as slug and write key")
-  chat.say("'config': lists your current bucket config")
-})
+function getCoffeeDetail(userId, field) {
+    Coffee.findOne({user_id: userId}, function(err, coffee) {
+        if(err) {
+            sendMessage(userId, {text: "Something went wrong. Try again"});
+        } else {
+            sendMessage(userId, {text: coffee[field]});
+        }
+    });
+}
 
-eventEmitter.on('new', function(itemSlug, time) {
-  schedule.scheduleJob(time, function(){
-    Cosmic.getObject(config, {slug: itemSlug}, function(error, response){
-      if(response.object.metadata.date == new Date(time).toISOString()){
-        bot.say(BotUserId, response.object.title)
-        console.log('firing reminder')
-      } else {
-        eventEmitter.emit('new', response.object.slug, response.object.metafield.date.value)
-        console.log('times do not match checking again at '+response.object.metadata.date)
-      }
-    })
-  })
-})
+function findCoffee(userId, wannaCoffee) {
+    if (wannaCoffee.indexOf("yes") >= 0 || wannaCoffee.indexOf("no") >= 0 ) {
+        console.log("wannaCoffee: " + wannaCoffee);
+        if (wannaCoffee.indexOf("yes") >= 0) {
+            var query = {user_id: userId};
+            var update = {
+                user_id: userId,
+                type: "Cappucciono",
+                date: new Date(),
+                image_url: "https://es.jura.com/-/media/global/images/coffee-recipes/cappuccino.jpg"
+            };
+            var options = {upsert: true};
+                    message = {
+                        attachment: {
+                            type: "template",
+                            payload: {
+                                template_type: "generic",
+                                elements: [{
+                                    title: "Cappuccino",
+                                    subtitle: "Do you like this one?",
+                                    image_url: "https://es.jura.com/-/media/global/images/coffee-recipes/cappuccino.jpg",
+                                    buttons: [{
+                                        type: "postback",
+                                        title: "Yes",
+                                        payload: "Correct"
+                                    }, {
+                                        type: "postback",
+                                        title: "No",
+                                        payload: "Incorrect"
+                                    }]
+                                }]
+                            }
+                        }
+                    };
+                    sendMessage(userId, message);
+        } else {
+            sendMessage(userId, {text: "Ok, write me later when you change your mind ;)"});
+        }
+    } else {
+        sendMessage(userId, {text: "Please answer Yes or No"});
+    }
+}
 
-bot.start();
+// sends message to user
+function sendMessage(recipientId, message) {
+    request({
+        url: "https://graph.facebook.com/v2.6/me/messages",
+        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
+        method: "POST",
+        json: {
+            recipient: {id: recipientId},
+            message: message,
+        }
+    }, function(error, response, body) {
+        if (error) {
+            console.log("Error sending message: " + response.error);
+        }
+    });
+}
