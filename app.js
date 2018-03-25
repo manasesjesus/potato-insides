@@ -50,9 +50,7 @@ app.get("/bizs/:id/purchases/", function (req, res) {
 app.get("/bizs/:id/feedbacks/", function (req, res) {
     let id   = req.params.id;
 
-    decoder.decodeQRImage();
-
-    res.json({ decode : "done" });
+    decoder.decodeQRImage(res, "path/to/image");
 });
 
 

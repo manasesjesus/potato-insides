@@ -41,7 +41,7 @@ function decodeQRImageLocal () {
     });
 }
 
-function decodeQRImage (img_url) {
+function decodeQRImage (res, img_url) {
     const download = require('image-downloader');
     img_url = 'http://scontent-ort2-1.xx.fbcdn.net/v/t34.0-12/29138872_105103870336911_1203187849_n.jpg?_nc_cat=0&_nc_ad=z-m&_nc_cid=0&oh=0c18af2bc3abc969fd6b039ce8095e67&oe=5AB8F89A';
     let img_name = 'qrcodes/feedbacks/uid_timestap.jpg';
@@ -76,6 +76,7 @@ function decodeQRImage (img_url) {
                         }
                         console.log(value.result);
                         console.log(value);
+                        res.json({ msg_decoded : value.result });
                     };
                     qr.decode(image.bitmap);
                 });
