@@ -71,7 +71,7 @@ function decodeQRImage (res, img_url) {
                     var qr = new QrCodeReader();
                     qr.callback = function(err, value) {
                         if (err) {
-                            console.error("invalid code");
+                            console.log("invalid code");
                             return null;
                         }
                         console.log(value.result);
