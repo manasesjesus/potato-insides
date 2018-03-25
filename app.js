@@ -27,6 +27,7 @@ const encoder = require("./controllers/encoder.js");
 const decoder = require("./controllers/decoder.js");
 
 // Process application/x-www-form-urlencoded
+app.set('port', PORT);
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
