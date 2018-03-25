@@ -211,6 +211,35 @@ function handlePostback(sender_psid, received_postback) {
 
       // Send the message to acknowledge the postback
       callSendAPI(sender_psid, response);
+
+      response = {
+          "attachment": {
+              "type": "template",
+              "payload": {
+                  "template_type": "generic",
+                  "elements": [{
+                      //"title": "Did you have a nice experience at " + biz_name + "?",
+                      //"subtitle": "Tap a button to answer.",
+                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png",
+                      "buttons": [
+                          {
+                              "type": "postback",
+                              "title": "Bye",
+                              "payload": "bye",
+                          },
+                          {
+                              "type": "postback",
+                              "title": "bitch!",
+                              "payload": "bitch",
+                          }
+                      ],
+                  }]
+              }
+          }
+      };
+
+      callSendAPI(sender_psid, response);
+
 }
 
 // Sends response messages via the Send API
