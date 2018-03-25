@@ -51,8 +51,8 @@ app.get("/bizs/:id/feedbacks/", function (req, res) {
     let id   = req.params.id;
 
     decoder.decodeQRImage();
-
-    res.end({ decode : "done" });
+    console.log("feedbacks called");
+    res.json({ decode : "done" });
 });
 
 
