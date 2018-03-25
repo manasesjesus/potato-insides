@@ -52,6 +52,10 @@ app.get("/bizs/:id/purchases/", function (req, res) {
  *
  */
 app.get('/webhook/', function(req, res) {
+    console.log(req.query['hub.verify_token']);
+    console.log(req.query['hub.challenge']);
+    console.log(process.env.VERIFY_TOKEN);
+
     if (req.query['hub.verify_token'] === process.env.VERIFY_TOKEN){
         return res.send(req.query['hub.challenge']);
     }
