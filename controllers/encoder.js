@@ -14,7 +14,7 @@ function createQRImage (res, img_name) {
     QRCode.toFile(img_name, img_name.substring(img_name.indexOf("/") + 1, img_name.indexOf(".png")), {
         color: {
             dark: "#00F",   // Blue dots
-            light: "#0000"  // Transparent background
+            light: "#FFFF"  // Transparent background
         },
         width: 500          // Image size (pixels)
     }, function (err) {

@@ -28,12 +28,34 @@ app
 /**
  *
  */
+//creates FeedbackQR
 app.get("/bizs/:id/purchases/", function (req, res) {
     let id   = req.params.id;
     let time = new Date().getTime();
-    let img_name = "qrcodes/" + id + "_" + time + ".png";
+    let img_name = "qrcodes/feedbackqr/" + id + "_" + time + ".png";
 
     encoder.createQRImage(res, img_name);
+});
+
+//Decodes and Evaluates FeedbackQR
+app.get("/decode", function (req, res) {
+  //how to load the image?
+  decoder.decodeQRImage(res, );
+});
+
+//create CouponQR
+app.get('/bizs/:id/coupons', function(req, res){
+  let id   = req.params.id;
+  let time = new Date().getTime();
+  let img_name = "qrcodes/couponqr/" + id + "_" + time + ".png";
+
+  encoder.createQRImage(res, img_name);
+});
+
+//Decode and Evaluate CouponQR
+//same as FeedbackQR
+app.get('decode/coupon', function (req, res) {
+
 });
 
 // for Facebook verification
