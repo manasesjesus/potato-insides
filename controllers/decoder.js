@@ -16,9 +16,11 @@ qr.callback = function(error, result) {
 
 function decodeQRImage () {
     var Jimp = require("jimp");
-    var buffer = fs.readFileSync("qrcodes/feedbacks/IMG_2018.png");
+    var buffer = fs.readFileSync("qrcodes/feedbacks/IMG_2018.jpg");
+
     Jimp.read(buffer, function(err, image) {
         if (err) {
+            // TODO: handle error
             console.log("There was an error here:");
             console.error(err);
 

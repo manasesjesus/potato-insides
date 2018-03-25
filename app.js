@@ -51,7 +51,7 @@ app.get("/bizs/:id/feedbacks/", function (req, res) {
     let id   = req.params.id;
 
     decoder.decodeQRImage();
-    console.log("feedbacks called");
+
     res.json({ decode : "done" });
 });
 
@@ -133,6 +133,8 @@ function handleMessage(sender_psid, received_message) {
     else if (received_message.attachments) {
         // Gets the URL of the message attachment
         let attachment_url = received_message.attachments[0].payload.url;
+
+        console.log(attachment_url);
 
         /* TODO:
             - decode the qr code
