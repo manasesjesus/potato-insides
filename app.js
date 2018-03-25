@@ -76,6 +76,7 @@ bot.setGetStartedButton((payload, chat) => {
     BotUserId = payload.sender.id;
 });
 
+/*
 bot.hear('setup', (payload, chat) => {
     const getBucketSlug = (convo) => {
         convo.ask("What's your buckets slug?", (payload, convo) => {
@@ -156,10 +157,13 @@ bot.hear('create', (payload, chat) => {
 bot.hear('active', (payload, chat) => {
   chat.say('finding all of your ongoing reminders.')
 })
+*/
+
+/*
 eventEmitter.on('new', function(itemSlug, time) {
-  schedule.scheduleJob(time, function(){
-    Cosmic.getObject(config, {slug: itemSlug}, function(error, response){
-      if(response.object.metadata.date == new Date(time).toISOString()){
+  schedule.scheduleJob(time, function() {
+    Cosmic.getObject(config, {slug: itemSlug}, function(error, response) {
+      if (response.object.metadata.date == new Date(time).toISOString()){
         bot.say(BotUserId, response.object.title)
         console.log('firing reminder')
       } else {
@@ -169,4 +173,6 @@ eventEmitter.on('new', function(itemSlug, time) {
     })
   })
 })
-bot.start()
+*/
+
+bot.start();
