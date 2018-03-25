@@ -178,7 +178,35 @@ function handleMessage(sender_psid, received_message) {
 
 // Handles messaging_postbacks events
 function handlePostback(sender_psid, received_postback) {
+    let response;
+    let feedmsg;
 
+    // Get the payload for the postback
+    let payload = received_postback.payload;
+
+    // Set the response based on the postback payload
+    if (payload === 'yes') {
+        feedmsg = "Thanks for your feedback! Here's your coupon for a free drink.";
+      } else if (payload === 'no') {
+        feedmsg = "We appologize for that and would like to give you a 10% discount coupon for your next purchase.";
+      }
+
+      response = {
+          "attachment": {
+              "type": "template",
+              "payload": {
+                  "template_type": "generic",
+                  "elements": [{
+                      "title": feedmsg,
+                      //"subtitle": "Tap a button to answer.",
+                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png"
+                  }]
+              }
+          }
+      }
+
+      // Send the message to acknowledge the postback
+      callSendAPI(sender_psid, response);
 }
 
 // Sends response messages via the Send API

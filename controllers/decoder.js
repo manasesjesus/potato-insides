@@ -5,6 +5,7 @@
 const QrCodeReader = require('qrcode-reader');
 const qr = new QrCodeReader();
 const fs = require('fs');
+var http = require('http');
 
 qr.callback = function(error, result) {
     if(error) {
@@ -40,30 +41,49 @@ function decodeQRImageLocal () {
     });
 }
 
-function decodeQRImage (url) {
-    var Jimp = require("jimp");
-    var buffer = fs.readFileSync("https://scontent-ort2-1.xx.fbcdn.net/v/t34.0-12/29138872_105103870336911_1203187849_n.jpg?_nc_cat=0&_nc_ad=z-m&_nc_cid=0&oh=0c18af2bc3abc969fd6b039ce8095e67&oe=5AB8F89A");
+function decodeQRImage (img_url) {
+    const download = require('image-downloader');
+    img_url = 'http://scontent-ort2-1.xx.fbcdn.net/v/t34.0-12/29138872_105103870336911_1203187849_n.jpg?_nc_cat=0&_nc_ad=z-m&_nc_cid=0&oh=0c18af2bc3abc969fd6b039ce8095e67&oe=5AB8F89A';
+    let img_name = 'qrcodes/feedbacks/uid_timestap.jpg';
+    options = {
+        url: img_url,
+        dest: img_name
+    }
 
-    Jimp.read(buffer, function(err, image) {
-        if (err) {
-            // TODO: handle error
-            console.log("There was an error here:");
-            console.error(err);
+    download.image(options)
+            .then(({ filename, image }) => {
+                console.log('File saved to', filename);
 
-            return;
-        }
+                var Jimp = require("jimp");
+                var buffer = fs.readFileSync(filename);
 
-        var qr = new QrCodeReader();
-        qr.callback = function(err, value) {
-            if (err) {
-                console.error(err);
-                // TODO handle error
-            }
-            console.log(value.result);
-            console.log(value);
-        };
-        qr.decode(image.bitmap);
-    });
+                console.log("leido....");
+
+                Jimp.read(buffer, function(err, image) {
+                    if (err) {
+                        // TODO: handle error
+                        console.log("There was an error here:");
+                        console.error(err);
+
+                        return;
+                    }
+
+                    var qr = new QrCodeReader();
+                    qr.callback = function(err, value) {
+                        if (err) {
+                            console.error("invalid code");
+                            return null;
+                        }
+                        console.log(value.result);
+                        console.log(value);
+                    };
+                    qr.decode(image.bitmap);
+                });
+
+            }).catch((err) => {
+                throw err
+            });
+
 }
 
 exports.decodeQRImage = decodeQRImage;
