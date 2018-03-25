@@ -68,42 +68,32 @@ const bot = new BootBot({
 });
 
 bot.setGreetingText("Welcome to the Feedback Rewards!");
+
 bot.setGetStartedButton((payload, chat) => {
-    chat.getUserProfile().then((user) => {
-        chat.say(`Hey ${user.first_name}, How are you today?`);
-    });
-
-    if (config.bucket === undefined) {
-        chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts');
-        chat.say("It seems like you have not setup your bucket settings yet. That has to be done before you can do anything else. Make sure to type 'setup'");
-    }
-    BotUserId = payload.sender.id;
+  if(config.bucket === undefined){
+    chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts')
+    chat.say("It seems like you have not setup your bucket settings yet. That has to be done before you can do anything else. Make sure to type 'setup'")
+  }
+  BotUserId = payload.sender.id
 });
 
-bot.hear(['hello', 'hey', 'sup'], (payload, chat) => {
-    chat.getUserProfile().then((user) => {
-        chat.say(`Hey ${user.first_name}, How are you today?`);
-    });
-});
-
-/*
 bot.hear('setup', (payload, chat) => {
-    const getBucketSlug = (convo) => {
-        convo.ask("What's your buckets slug?", (payload, convo) => {
-            var slug = payload.message.text;
-            convo.set('slug', slug)
-            convo.say("setting slug as "+slug).then(() => getBucketReadKey(convo));
-        });
-    }
+  const getBucketSlug = (convo) => {
+    convo.ask("What's your Bucket's slug?", (payload, convo) => {
+      var slug = payload.message.text;
+      convo.set('slug', slug)
+      convo.say("setting slug as "+slug).then(() => getBucketReadKey(convo));
+    })
+  }
   const getBucketReadKey = (convo) => {
-    convo.ask("What's your buckets read key?", (payload, convo) => {
+    convo.ask("What's your Bucket's read key?", (payload, convo) => {
       var readkey = payload.message.text;
       convo.set('read_key', readkey)
       convo.say('setting read_key as '+readkey).then(() => getBucketWriteKey(convo))
     })
   }
   const getBucketWriteKey = (convo) => {
-    convo.ask("What's your buckets write key?", (payload, convo) => {
+    convo.ask("What's your Bucket's write key?", (payload, convo) => {
       var writekey = payload.message.text
       convo.set('write_key', writekey)
       convo.say('setting write_key as '+writekey).then(() => finishing(convo))
@@ -125,12 +115,19 @@ bot.hear('setup', (payload, chat) => {
   })
 })
 
-bot.hear('config', (payloadc, hat) => {
+bot.hear(['hello', 'hey', 'sup'], (payload, chat)=>{
+  chat.getUserProfile().then((user) => {
+    chat.say(`Hey ${user.first_name}, How are you today?`)
+  })
+})
+
+bot.hear('config', (payload, chat) => {
   if(JSON.stringify(config.bucket) === undefined){
     chat.say("No config found :/ Be sure to run 'setup' to add your bucket details")
   }
   chat.say("A config has been found :) "+ JSON.stringify(config.bucket))
 })
+
 bot.hear('create', (payload, chat) => {
   chat.conversation((convo) => {
     convo.ask("What would you like your reminder to be? etc 'I have an appointment tomorrow from 10 to 11 AM' the information will be added automatically", (payload, convo) => {
@@ -160,16 +157,18 @@ bot.hear('create', (payload, chat) => {
     })
   })
 })
-bot.hear('active', (payload, chat) => {
-  chat.say('finding all of your ongoing reminders.')
-})
-*/
 
-/*
+bot.hear('help', (payload, chat) => {
+  chat.say('Here are the following commands for use.')
+  chat.say("'create': add a new reminder")
+  chat.say("'setup': add your bucket info such as slug and write key")
+  chat.say("'config': lists your current bucket config")
+})
+
 eventEmitter.on('new', function(itemSlug, time) {
-  schedule.scheduleJob(time, function() {
-    Cosmic.getObject(config, {slug: itemSlug}, function(error, response) {
-      if (response.object.metadata.date == new Date(time).toISOString()){
+  schedule.scheduleJob(time, function(){
+    Cosmic.getObject(config, {slug: itemSlug}, function(error, response){
+      if(response.object.metadata.date == new Date(time).toISOString()){
         bot.say(BotUserId, response.object.title)
         console.log('firing reminder')
       } else {
@@ -179,6 +178,5 @@ eventEmitter.on('new', function(itemSlug, time) {
     })
   })
 })
-*/
 
 bot.start();
