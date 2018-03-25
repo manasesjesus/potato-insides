@@ -1,2 +1,2 @@
 # potato-insides
-Hackathon OpenCodes Project
+Hackathon OpenCodes Project 2018
