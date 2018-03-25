@@ -19,8 +19,10 @@ function decodeQRImage () {
     var buffer = fs.readFileSync("qrcodes/feedbacks/IMG_2018.png");
     Jimp.read(buffer, function(err, image) {
         if (err) {
+            console.log("There was an error here:");
             console.error(err);
-            // TODO handle error
+
+            return;
         }
 
         var qr = new QrCodeReader();
