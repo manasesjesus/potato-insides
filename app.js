@@ -67,7 +67,7 @@ const bot = new BootBot({
   appSecret: process.env.APP_SECRET
 });
 
-bot.setGreetingText("Hello, I'm here to help you manage your tasks. Be sure to setup your bucket by typing 'Setup'. ");
+bot.setGreetingText("Hello, I'm your fokin chatbot #rethinkhackathon ");
 bot.setGetStartedButton((payload, chat) => {
     if (config.bucket === undefined) {
         chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts');
