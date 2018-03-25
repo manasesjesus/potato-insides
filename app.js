@@ -67,13 +67,23 @@ const bot = new BootBot({
   appSecret: process.env.APP_SECRET
 });
 
-bot.setGreetingText("Hello, I'm your fokin chatbot #rethinkhackathon ");
+bot.setGreetingText("Welcome to the Feedback Rewards!");
 bot.setGetStartedButton((payload, chat) => {
+    chat.getUserProfile().then((user) => {
+        chat.say(`Hey ${user.first_name}, How are you today?`);
+    });
+
     if (config.bucket === undefined) {
         chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts');
         chat.say("It seems like you have not setup your bucket settings yet. That has to be done before you can do anything else. Make sure to type 'setup'");
     }
     BotUserId = payload.sender.id;
+});
+
+bot.hear(['hello', 'hey', 'sup'], (payload, chat) => {
+    chat.getUserProfile().then((user) => {
+        chat.say(`Hey ${user.first_name}, How are you today?`);
+    });
 });
 
 /*
@@ -114,11 +124,7 @@ bot.hear('setup', (payload, chat) => {
     getBucketSlug(convo)
   })
 })
-bot.hear(['hello', 'hey', 'sup'], (payload, chat)=>{
-  chat.getUserProfile().then((user) => {
-    chat.say(`Hey ${user.first_name}, How are you today?`)
-  })
-})
+
 bot.hear('config', (payloadc, hat) => {
   if(JSON.stringify(config.bucket) === undefined){
     chat.say("No config found :/ Be sure to run 'setup' to add your bucket details")
