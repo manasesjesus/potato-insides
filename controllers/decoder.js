@@ -14,7 +14,7 @@ qr.callback = function(error, result) {
     console.log(result);
 }
 
-function decodeQRImage () {
+function decodeQRImageLocal () {
     var Jimp = require("jimp");
     var buffer = fs.readFileSync("qrcodes/feedbacks/IMG_2018.jpg");
 
@@ -38,6 +38,21 @@ function decodeQRImage () {
         };
         qr.decode(image.bitmap);
     });
+}
+
+function decodeQRImage (url) {
+
+    var qr = new QrCodeReader();
+    qr.callback = function(err, value) {
+        if (err) {
+            console.error(err);
+            // TODO handle error
+        }
+        console.log(value.result);
+        console.log(value);
+    };
+    qr.decode(url);
+
 }
 
 exports.decodeQRImage = decodeQRImage;
