@@ -23,7 +23,7 @@ function decodeQRImage () {
             // TODO handle error
         }
 
-        var qr = new QrCode();
+        var qr = new QrCodeReader();
         qr.callback = function(err, value) {
             if (err) {
                 console.error(err);
