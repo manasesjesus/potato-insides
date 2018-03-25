@@ -36,4 +36,4 @@ function decodeQRImage () {
     });
 }
 
-exports.createQRImage = decodeQRImage;
+exports.decodeQRImage = decodeQRImage;
