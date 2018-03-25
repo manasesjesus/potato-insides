@@ -116,20 +116,29 @@ function handleMessage(sender_psid, received_message) {
     if (received_message.text) {
         // Create the payload for a basic text message
         response = {
-            "text": `You sent the message: "${received_message.text}". Now send me an image!`
+            "text": "Hello! Please send me your QR code to validate it."
         };
     }
     else if (received_message.attachments) {
         // Gets the URL of the message attachment
         let attachment_url = received_message.attachments[0].payload.url;
+
+        /* TODO:
+            - decode the qr code
+            - if invalid, return error message to Messenger
+            - if valid, extract the biz's name and set it in the variable below
+         */
+
+        let biz_name = "Fast Burgers";
+
         response = {
             "attachment": {
                 "type": "template",
                 "payload": {
                     "template_type": "generic",
                     "elements": [{
-                        "title": "Is this the right picture?",
-                        "subtitle": "Tap a button to answer.",
+                        "title": "Did you have a nice experience at " + biz_name + "?",
+                        //"subtitle": "Tap a button to answer.",
                         "image_url": attachment_url,
                         "buttons": [
                             {
