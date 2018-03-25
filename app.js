@@ -153,7 +153,7 @@ function handleMessage(sender_psid, received_message) {
                     "elements": [{
                         "title": "Did you have a nice experience at " + biz_name + "?",
                         //"subtitle": "Tap a button to answer.",
-                        "image_url": attachment_url,
+                        //"image_url": attachment_url,
                         "buttons": [
                             {
                                 "type": "postback",
