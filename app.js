@@ -70,6 +70,8 @@ const bot = new BootBot({
 bot.setGreetingText("Welcome to the Feedback Rewards!");
 
 bot.setGetStartedButton((payload, chat) => {
+    console.log("setGetStartedButton pressed");
+    chat.say(`Hey ${user.first_name}, How are you today?`);
   if(config.bucket === undefined){
     chat.say('Hello my name is Note Buddy and I can help you keep track of your thoughts')
     chat.say("It seems like you have not setup your bucket settings yet. That has to be done before you can do anything else. Make sure to type 'setup'")
