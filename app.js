@@ -1,16 +1,16 @@
-'use strict'
+'use strict';
 /**
  * Description of the awesome node app
  */
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 1337;
 
 // Middlewares
 const express = require("express");
 const app  = express();
 const bodyParser = require("body-parser");
-const request = require("request");
+//const request = require("request");
 
 require("dotenv").config();
 
@@ -23,7 +23,7 @@ const decoder = require("./controllers/decoder.js");
 
 // Process application/x-www-form-urlencoded
 app.set('port', PORT);
-app.use(bodyParser.urlencoded({extended: false}))
+//app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 // Start server
@@ -50,161 +50,58 @@ app.get("/bizs/:id/purchases/", function (req, res) {
 /**
  *
  */
-app.get('/webhook/', function(req, res) {
+/*app.get('/webhook/', function(req, res) {
     if (req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
         console.log("Verified token");
         return res.status(200).send(req.query["hub.challenge"]);
     }
     res.send('wrong token');
 });
+*/
 
+app.get('/webhook', (req, res) => {
+    // Your verify token. Should be a random string.
+    //let VERIFY_TOKEN = "<YOUR_VERIFY_TOKEN>"
 
+    // Parse the query params
+    let mode = req.query['hub.mode'];
+    let token = req.query['hub.verify_token'];
+    let challenge = req.query['hub.challenge'];
 
-// All callbacks for Messenger will be POST-ed here
-app.post("/webhook", function (req, res) {
-    if (req.body.object == "page") {
-        // Iterate over each entry
-        // There may be multiple entries if batched
-        req.body.entry.forEach(function(entry) {
-            entry.messaging.forEach(function(event) {
-                if (event.postback) {
-                    processPostback(event);
-                } else if (event.message) {
-                    processMessage(event);
-                }
-            });
-        });
+    // Checks if a token and mode is in the query string of the request
+    if (mode && token) {
+        // Checks the mode and token sent is correct
+        if (mode === 'subscribe' && token === process.env.VERIFY_TOKEN) {
 
-        res.sendStatus(200);
+            // Responds with the challenge token from the request
+            console.log('WEBHOOK_VERIFIED');
+            res.status(200).send(challenge);
+        } else {
+            // Responds with '403 Forbidden' if verify tokens do not match
+            res.sendStatus(403);
+        }
     }
 });
 
-function processPostback(event) {
-    var senderId = event.sender.id;
-    var payload = event.postback.payload;
+app.post('/webhook', (req, res) => {
+    let body = req.body;
 
-    if (payload === "Greeting") {
-        // Get user's first name from the User Profile API
-        // and include it in the greeting
-        request({
-            url: "https://graph.facebook.com/v2.6/" + senderId,
-            qs: {
-                access_token: process.env.PAGE_ACCESS_TOKEN,
-                fields: "first_name"
-            },
-            method: "GET"
-        }, function(error, response, body) {
-            var greeting = "";
-            if (error) {
-                console.log("Error getting user's name: " +  error);
-            } else {
-                var bodyObj = JSON.parse(body);
-                name = bodyObj.first_name;
-                greeting = "Hello " + name + "! ";
-            }
-            var message = greeting + "I'm Taco, your virtual weiter. Would you like a free coffee?";
-            sendMessage(senderId, {text: message});
+    // Checks this is an event from a page subscription
+    if (body.object === 'page') {
+
+        // Iterates over each entry - there may be multiple if batched
+        body.entry.forEach(function(entry) {
+
+          // Gets the message. entry.messaging is an array, but
+          // will only ever contain one message, so we get index 0
+          let webhook_event = entry.messaging[0];
+          console.log(webhook_event);
         });
-    } else if (payload === "Correct") {
-        sendMessage(senderId, {text: "Great! Come any day to PoC Restaurant with this code FC1982 and claim your free coffee ;)"});
-    } else if (payload === "Incorrect") {
-        sendMessage(senderId, {text: "Oops! Sorry about that. I don't have other coffee today :("});
-    }
-}
 
-function processMessage(event) {
-    if (!event.message.is_echo) {
-        var message = event.message;
-        var senderId = event.sender.id;
-
-        console.log("Received message from senderId: " + senderId);
-        console.log("Message is: " + JSON.stringify(message));
-
-        // You may get a text or attachment but not both
-        if (message.text) {
-            var formattedMsg = message.text.toLowerCase().trim();
-
-            switch (formattedMsg) {
-                case "type":
-                case "date":
-                getCoffeeDetail(senderId, formattedMsg);
-                break;
-
-                default:
-                findCoffee(senderId, formattedMsg);
-            }
-        } else if (message.attachments) {
-            sendMessage(senderId, {text: "Sorry, I don't understand your request."});
-        }
-    }
-}
-
-function getCoffeeDetail(userId, field) {
-    Coffee.findOne({user_id: userId}, function(err, coffee) {
-        if(err) {
-            sendMessage(userId, {text: "Something went wrong. Try again"});
-        } else {
-            sendMessage(userId, {text: coffee[field]});
-        }
-    });
-}
-
-function findCoffee(userId, wannaCoffee) {
-    if (wannaCoffee.indexOf("yes") >= 0 || wannaCoffee.indexOf("no") >= 0 ) {
-        console.log("wannaCoffee: " + wannaCoffee);
-        if (wannaCoffee.indexOf("yes") >= 0) {
-            var query = {user_id: userId};
-            var update = {
-                user_id: userId,
-                type: "Cappucciono",
-                date: new Date(),
-                image_url: "https://es.jura.com/-/media/global/images/coffee-recipes/cappuccino.jpg"
-            };
-            var options = {upsert: true};
-                    message = {
-                        attachment: {
-                            type: "template",
-                            payload: {
-                                template_type: "generic",
-                                elements: [{
-                                    title: "Cappuccino",
-                                    subtitle: "Do you like this one?",
-                                    image_url: "https://es.jura.com/-/media/global/images/coffee-recipes/cappuccino.jpg",
-                                    buttons: [{
-                                        type: "postback",
-                                        title: "Yes",
-                                        payload: "Correct"
-                                    }, {
-                                        type: "postback",
-                                        title: "No",
-                                        payload: "Incorrect"
-                                    }]
-                                }]
-                            }
-                        }
-                    };
-                    sendMessage(userId, message);
-        } else {
-            sendMessage(userId, {text: "Ok, write me later when you change your mind ;)"});
-        }
+        // Returns a '200 OK' response to all requests
+        res.status(200).send('EVENT_RECEIVED');
     } else {
-        sendMessage(userId, {text: "Please answer Yes or No"});
+        // Returns a '404 Not Found' if event is not from a page subscription
+        res.sendStatus(404);
     }
-}
-
-// sends message to user
-function sendMessage(recipientId, message) {
-    request({
-        url: "https://graph.facebook.com/v2.6/me/messages",
-        qs: {access_token: process.env.PAGE_ACCESS_TOKEN},
-        method: "POST",
-        json: {
-            recipient: {id: recipientId},
-            message: message,
-        }
-    }, function(error, response, body) {
-        if (error) {
-            console.log("Error sending message: " + response.error);
-        }
-    });
-}
+});
