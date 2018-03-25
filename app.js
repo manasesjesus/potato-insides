@@ -182,7 +182,7 @@ function handlePostback(sender_psid, received_postback) {
     // Get the payload for the postback
     let payload = received_postback.payload;
 
-console.log("payload: " + payload);
+    console.log("payload: " + payload);
 
     // Set the response based on the postback payload
     if (payload === 'yes') {
@@ -191,7 +191,7 @@ console.log("payload: " + payload);
         feedmsg = "We appologize for that and would like to give you a 10% discount coupon for your next purchase.";
       }
 
-      response = {
+    /*  response = {
           "attachment": {
               "type": "template",
               "payload": {
@@ -203,7 +203,11 @@ console.log("payload: " + payload);
                   }]
               }
           }
-      }
+      }*/
+
+      response = {
+          "text": feedmsg
+      };
 
       // Send the message to acknowledge the postback
       callSendAPI(sender_psid, response);
