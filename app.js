@@ -216,24 +216,18 @@ function handlePostback(sender_psid, received_postback) {
           "attachment": {
               "type": "template",
               "payload": {
-                  "template_type": "generic",
+                  "template_type": "media",
                   "elements": [{
-                      //"title": "Did you have a nice experience at " + biz_name + "?",
-                      //"subtitle": "Tap a button to answer.",
-                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png",
-                      "buttons": [
-                          {
-                              "type": "postback",
-                              "title": "Bye",
-                              "payload": "bye",
-                          },
-                          {
-                              "type": "postback",
-                              "title": "bitch!",
-                              "payload": "bitch",
-                          }
-                      ],
-                  }]
+      "media_type": "image",
+      "url": "qrcodes/coupons/mcbrgs_1521932291606.png",
+      "buttons": [
+         {
+            "type": "web_url",
+            "url": "#",
+            "title": "bye bitch!",
+         }
+      ]
+   }]
               }
           }
       };
