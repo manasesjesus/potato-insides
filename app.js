@@ -39,9 +39,20 @@ app.get('/', (req, res) => res.json({ "hi" : "hooman" }));
 app.get("/bizs/:id/purchases/", function (req, res) {
     let id   = req.params.id;
     let time = new Date().getTime();
-    let img_name = "qrcodes/" + id + "_" + time + ".png";
+    let img_name = "qrcodes/purchases" + id + "_" + time + ".png";
 
     encoder.createQRImage(res, img_name);
+});
+
+/**
+ *
+ */
+app.get("/bizs/:id/feedbacks/", function (req, res) {
+    let id   = req.params.id;
+
+    decoder.decodeQRImage();
+
+    res.end({ decode : "done" });
 });
 
 
@@ -131,6 +142,7 @@ function handleMessage(sender_psid, received_message) {
 
         let biz_name = "Fast Burgers";
 
+        // valid QR code response
         response = {
             "attachment": {
                 "type": "template",

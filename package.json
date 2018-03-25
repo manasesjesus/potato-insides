@@ -1,7 +1,7 @@
 {
   "name": "potato-insides",
   "version": "0.0.1",
-  "description": "An Awesome SaaS for Customer Feedback",
+  "description": "An Awesome SaaS Chabot for Customer Feedback",
   "engines": {
     "node": "8.9.1"
   },
@@ -12,7 +12,9 @@
   "dependencies": {
     "dotenv": "^5.0.1",
     "express": "^4.15.2",
+    "jimp": "^0.2.28",
     "qrcode": "^1.2.0",
+    "qrcode-reader": "^1.0.4",
     "request": "^2.85.0"
   },
   "devDependencies": {
