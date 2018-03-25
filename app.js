@@ -132,7 +132,7 @@ function handleMessage(sender_psid, received_message) {
         // Gets the URL of the message attachment
         let attachment_url = received_message.attachments[0].payload.url;
 
-        console.log(attachment_url);
+        //console.log(attachment_url);
 
         /* TODO:
             - decode the qr code
@@ -178,6 +178,8 @@ function handleMessage(sender_psid, received_message) {
 function handlePostback(sender_psid, received_postback) {
     let response;
     let feedmsg;
+
+    console.log("loads the postback");
 
     // Get the payload for the postback
     let payload = received_postback.payload;
