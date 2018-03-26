@@ -204,9 +204,9 @@ function handlePostback(sender_psid, received_postback) {
               "payload": {
                   "template_type": "generic",
                   "elements": [{
-                      "title": "This is your coupon and it's valid for 30 days",
+                      //"title": "This is your coupon and it's valid for 30 days",
                       //"subtitle": "Tap a button to answer.",
-                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png",
+                      "image_url": "https://cdnqrcgde.s3-eu-west-1.amazonaws.com/wp-content/uploads/2013/11/jpeg.jpg",
                       "buttons": [
                           {
                               "type": "postback",
