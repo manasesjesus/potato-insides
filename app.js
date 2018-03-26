@@ -196,7 +196,7 @@ function handlePostback(sender_psid, received_postback) {
       };
 
       // Send the message to acknowledge the postback
-      callSendAPI(sender_psid, response);
+      //callSendAPI(sender_psid, response);
 
       let imgres = {
           "attachment": {
@@ -204,14 +204,14 @@ function handlePostback(sender_psid, received_postback) {
               "payload": {
                   "template_type": "generic",
                   "elements": [{
-                      //"title": "This is your coupon and it's valid for 30 days",
+                      "title": feedmsg,
                       //"subtitle": "Tap a button to answer.",
                       "image_url": "https://cdnqrcgde.s3-eu-west-1.amazonaws.com/wp-content/uploads/2013/11/jpeg.jpg",
                       "buttons": [
                           {
                               "type": "postback",
                               "title": "Give more feedback",
-                              "payload": "more_feed",
+                              "payload": "more_feed"
                           }
                       ],
                   }]
