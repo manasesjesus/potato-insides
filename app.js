@@ -206,7 +206,7 @@ function handlePostback(sender_psid, received_postback) {
                   "elements": [{
                       "title": "This is your coupon and it's valid for 30 days",
                       //"subtitle": "Tap a button to answer.",
-                      "image_url": qrcodes/coupons/mcbrgs_1521932291606.png,
+                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png",
                       "buttons": [
                           {
                               "type": "postback",
