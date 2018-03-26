@@ -191,20 +191,6 @@ function handlePostback(sender_psid, received_postback) {
         feedmsg = "We appologize for that and would like to give you a 10% discount coupon for your next purchase.";
       }
 
-    /*  response = {
-          "attachment": {
-              "type": "template",
-              "payload": {
-                  "template_type": "generic",
-                  "elements": [{
-                      "title": feedmsg,
-                      //"subtitle": "Tap a button to answer.",
-                      "image_url": "qrcodes/coupons/mcbrgs_1521932291606.png"
-                  }]
-              }
-          }
-      }*/
-
       response = {
           "text": feedmsg
       };
@@ -212,27 +198,28 @@ function handlePostback(sender_psid, received_postback) {
       // Send the message to acknowledge the postback
       callSendAPI(sender_psid, response);
 
-      response = {
+      let imgres = {
           "attachment": {
               "type": "template",
               "payload": {
-                  "template_type": "media",
+                  "template_type": "generic",
                   "elements": [{
-      "media_type": "image",
-      "url": "qrcodes/coupons/mcbrgs_1521932291606.png",
-      "buttons": [
-         {
-            "type": "web_url",
-            "url": "#",
-            "title": "bye bitch!",
-         }
-      ]
-   }]
+                      "title": "This is your coupon and it's valid for 30 days",
+                      //"subtitle": "Tap a button to answer.",
+                      "image_url": qrcodes/coupons/mcbrgs_1521932291606.png,
+                      "buttons": [
+                          {
+                              "type": "postback",
+                              "title": "Give more feedback",
+                              "payload": "more_feed",
+                          }
+                      ],
+                  }]
               }
           }
       };
 
-      callSendAPI(sender_psid, response);
+      callSendAPI(sender_psid, imgres);
 
 }
 
@@ -254,7 +241,7 @@ function callSendAPI(sender_psid, response) {
         "json": request_body
     }, (err, res, body) => {
         if (!err) {
-            console.log('message sent!')
+            console.log('message sent: ' + request_body.message)
         } else {
             console.error("Unable to send message:" + err);
         }
