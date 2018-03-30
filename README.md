@@ -1,2 +1,3 @@
-# potato-insides
-Hackathon OpenCodes Project
+
+## OpenCodes.io Hackathon '18 
+QR Codes messenger chatbot
